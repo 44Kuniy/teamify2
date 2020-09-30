@@ -85,7 +85,21 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   handleContextMenu = e => {
     e.preventDefault()
     console.log('prevent default')
+    console.log({ e })
     localStorage.setItem(APP_KEY, JSON.stringify({ test: 'storage test' }))
+  }
+
+  // const [ls, setName] = React.useState('')
+  //   React.useEffect(() => {
+  //     setName(localStorage.getItem('test'))
+  //   })
+  //   const storageData = JSON.parse(ls)
+  //   console.log({ storageData })
+  isBrowser = () => typeof window !== 'undefined'
+
+  fetchLS = () => {
+    const data = this.isBrowser() && window.localStorage.getItem(APP_KEY) ? JSON.parse(window.localStorage.getItem(APP_KEY)) : {}
+    console.log({ data })
   }
 
   render() {
@@ -126,7 +140,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
           >
             {subGrid.map((data, index) => {
               return (
-                <div className={`elevation-4 ${loading || ''}`} css={cell} key={data.i} onContextMenu={this.handleContextMenu}>
+                <div className={`elevation-4 ${loading || ''}`} css={cell} key={data.i} onContextMenu={this.fetchLS}>
                   {data.i}
                 </div>
               )
