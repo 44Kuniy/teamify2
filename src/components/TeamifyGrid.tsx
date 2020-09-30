@@ -32,9 +32,6 @@ interface ReactGridLayoutState {
   loading: boolean
 }
 const APP_KEY = 'teamify-app'
-const ls = localStorage.getItem(APP_KEY)
-const storageData = JSON.parse(ls)
-console.log({ storageData })
 
 class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   // コンストラクタで初期値をセット
