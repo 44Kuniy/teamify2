@@ -70,10 +70,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     }
   }
 
-  componentDidMount() {
-    document.addEventListener('contextmenu', this.handleContextMenu)
-  }
-
   onLayoutChange(layout) {
     console.log({ layout })
     this.setState({ loading: false })
