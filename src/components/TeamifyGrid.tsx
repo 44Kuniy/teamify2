@@ -254,6 +254,10 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     const name: string = e.target.value as string
     if (!name) return
     const { mainGrid } = this.state
+    if (mainGrid.some((item: ReactGridLayoutItem) => name === item.i)) {
+      alert('同じ名前の人は登録できないよ')
+      return
+    }
     const leftTeamCount = mainGrid.filter(item => item.x === 0).length
     const rightTeamCount = mainGrid.filter(item => item.x === 1).length
     const isLeftTeam = leftTeamCount <= rightTeamCount
