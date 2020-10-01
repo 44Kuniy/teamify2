@@ -321,7 +321,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     const text = mainGrid.reduce((accumulator, currentValue, currentIndex, array) => {
       if (currentIndex === 5) return `${accumulator}\n\`\`\`= Team 2 =\`\`\`\n${currentValue.i}\n`
       return `${accumulator + currentValue.i}\n`
-    }, '\n```= Team 1 =```\n')
+    }, '.\n```= Team 1 =```\n')
     const textField = document.createElement('textarea')
     const br = document.createElement('br')
     textField.value = text
