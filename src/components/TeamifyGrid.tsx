@@ -77,10 +77,7 @@ const rightContainer = css`
 `
 const nameInputContainer = css``
 
-const buttons = css`
-  display: flex;
-  justify-content: space-around;
-`
+const buttons = css``
 
 const description = css`
   font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
@@ -104,6 +101,10 @@ const benchText = css`
 
 const nameInput = css`
   width: 260px;
+`
+
+const otherButtons = css`
+  margin: 0px 12px 24px !important;
 `
 //
 interface ReactGridLayoutItem {
@@ -138,6 +139,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.cellToSub = this.cellToSub.bind(this)
     this.cellToMain = this.cellToMain.bind(this)
     this.deleteCell = this.deleteCell.bind(this)
+    this.copyToCripBoard = this.copyToCripBoard.bind(this)
 
     // この例では関数内でthisを使用するため、thisをbind
     // this.bindFunc = this.func.bind(this);
@@ -314,6 +316,22 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.setState({ subGrid })
   }
 
+  copyToCripBoard = () => {
+    const { mainGrid } = this.state
+    const text = mainGrid.reduce((accumulator, currentValue, currentIndex, array) => {
+      if (currentIndex === 5) return `${accumulator}\n\`\`\`= Team 2 =\`\`\`\n${currentValue.i}\n`
+      return `${accumulator + currentValue.i}\n`
+    }, '\n```= Team 1 =```\n')
+    const textField = document.createElement('textarea')
+    const br = document.createElement('br')
+    textField.value = text
+    const parentElement = document.getElementById('hidden')
+    parentElement.appendChild(textField)
+    textField.select()
+    document.execCommand('copy')
+    parentElement.removeChild(textField)
+  }
+
   render() {
     const { mainGrid, subGrid, loading } = this.state
 
@@ -350,21 +368,31 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
               </GridLayout>
             </div>
             <div css={buttons}>
-              <div css={nameInputContainer}>
-                <div className="ui labeled input">
-                  <div className="ui label">名前打ってEnter</div>
-                  <input type="text" placeholder={`今 ${mainGrid.length} 人`} onKeyPress={e => this.addCell(e)} css={nameInput} />
-                </div>
-              </div>
               <div>
                 <button
                   type="button"
                   className="ui button teal
                 "
                   onClick={this.shuffle}
+                  css={otherButtons}
                 >
                   シャッフル
                 </button>
+                <button
+                  type="button"
+                  className="ui button teal
+                "
+                  onClick={this.copyToCripBoard}
+                  css={otherButtons}
+                >
+                  コピー（押してから `Ctrl + V` ）
+                </button>
+              </div>
+              <div css={nameInputContainer}>
+                <div className="ui labeled input">
+                  <div className="ui label">名前打ってEnter</div>
+                  <input type="text" placeholder={`今 ${mainGrid.length} 人`} onKeyPress={e => this.addCell(e)} css={nameInput} />
+                </div>
               </div>
             </div>
           </div>
@@ -405,6 +433,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
             </li>
           </ul>
         </div>
+        <div id="hidden" />
       </div>
     )
   }
