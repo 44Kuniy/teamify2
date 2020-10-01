@@ -5,6 +5,7 @@ import { jsx, css } from '@emotion/core'
 import Page from '../components/Page'
 import Container from '../components/Container'
 import IndexLayout from '../layouts'
+import 'semantic-ui-css/semantic.min.css'
 
 const h1style = css`
   background-color: #000;
