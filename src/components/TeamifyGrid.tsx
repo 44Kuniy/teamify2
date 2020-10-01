@@ -56,7 +56,7 @@ const deleteButton = css`
   width: 70px;
   height: 32px;
   font-size: 0.8rem !important;
-  margin: 168px 0;
+  margin: 24px 0 !important;
 `
 const deleteButtonContainer = css`
   width: 90px;
@@ -64,9 +64,6 @@ const deleteButtonContainer = css`
   right: 0;
   top: 0;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
 `
 const leftContainer = css`
   width: 65%;
