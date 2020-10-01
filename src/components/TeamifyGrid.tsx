@@ -101,6 +101,10 @@ const benchText = css`
   padding-bottom: 1.5rem;
   font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
 `
+
+const nameInput = css`
+  width: 260px;
+`
 //
 interface ReactGridLayoutItem {
   i: string
@@ -306,7 +310,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   render() {
-    const { mainGrid, subGrid, bottomGrid, loading } = this.state
+    const { mainGrid, subGrid, loading } = this.state
 
     return (
       <div>
@@ -344,7 +348,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
               <div css={nameInputContainer}>
                 <div className="ui labeled input">
                   <div className="ui label">名前打ってEnter</div>
-                  <input type="text" placeholder={`今 ${mainGrid.length} 人`} onKeyPress={e => this.addCell(e)} />
+                  <input type="text" placeholder={`今 ${mainGrid.length} 人`} onKeyPress={e => this.addCell(e)} css={nameInput} />
                 </div>
               </div>
               <div>
