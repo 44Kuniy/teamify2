@@ -142,6 +142,9 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     // この例では関数内でthisを使用するため、thisをbind
     // this.bindFunc = this.func.bind(this);
     const state: ReactGridLayoutState = this.fetchLS()
+    if (!state.mainGrid) state.mainGrid = []
+    if (!state.subGrid) state.subGrid = []
+
     console.log(`state!!!!! :`, state)
     // const mainGrid: ReactGridLayoutItem[] = [
     //   { x: 0, y: 0, w: 1, h: 1, i: 'souler', static: false },
@@ -156,7 +159,8 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     //   { x: 1, y: 4, w: 1, h: 1, i: '10th', static: false }
     // ]
     const { mainGrid, subGrid } = state
-
+    console.log(`mainGrid :`, mainGrid)
+    console.log(`subGrid :`, subGrid)
     // const subGrid: ReactGridLayoutItem[] = []
 
     // stateの初期値を設定
@@ -208,6 +212,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   isBrowser = () => typeof window !== 'undefined'
 
   fetchLS = () => {
+    console.log(`fetchLS :`)
     const data = this.isBrowser() && window.localStorage.getItem(APP_KEY) ? JSON.parse(window.localStorage.getItem(APP_KEY)) : {}
     return data
   }
