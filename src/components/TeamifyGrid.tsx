@@ -153,29 +153,11 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.deleteCell = this.deleteCell.bind(this)
     this.copyToCripBoard = this.copyToCripBoard.bind(this)
 
-    // この例では関数内でthisを使用するため、thisをbind
-    // this.bindFunc = this.func.bind(this);
     const state: ReactGridLayoutState = this.fetchLS()
     if (!state.mainGrid) state.mainGrid = []
     if (!state.subGrid) state.subGrid = []
 
-    console.log(`state!!!!! :`, state)
-    // const mainGrid: ReactGridLayoutItem[] = [
-    //   { x: 0, y: 0, w: 1, h: 1, i: 'souler', static: false },
-    //   { x: 0, y: 1, w: 1, h: 1, i: 'inagibukit', static: true },
-    //   { x: 0, y: 2, w: 1, h: 1, i: 'ujimatcha', static: false },
-    //   { x: 0, y: 3, w: 1, h: 1, i: 'me, me', static: true },
-    //   { x: 0, y: 4, w: 1, h: 1, i: 'unconcencios bias', static: false },
-    //   { x: 1, y: 0, w: 1, h: 1, i: 'nasinana', static: true },
-    //   { x: 1, y: 1, w: 1, h: 1, i: 'adasd asndas', static: false },
-    //   { x: 1, y: 2, w: 1, h: 1, i: 'dasdmasndaspd@', static: false },
-    //   { x: 1, y: 3, w: 1, h: 1, i: '9th', static: false },
-    //   { x: 1, y: 4, w: 1, h: 1, i: '10th', static: false }
-    // ]
     const { mainGrid, subGrid } = state
-    console.log(`mainGrid :`, mainGrid)
-    console.log(`subGrid :`, subGrid)
-    // const subGrid: ReactGridLayoutItem[] = []
 
     // stateの初期値を設定
     this.state = {
@@ -190,15 +172,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     console.log('ON LAYOUT CHANGE')
     console.table(layout)
     const { mainGrid, subGrid } = this.state
-    // const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
-    //   const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
-    //   gridItem.x = layoutItem.x
-    //   gridItem.y = layoutItem.y
-    //   gridItem.static = layoutItem.static
-    //   return gridItem
-    // })
-    // console.table(newGridLayout)
-    // this.setState({ mainGrid: newGridLayout })
     this.saveToLocalStorage({ mainGrid, subGrid })
   }
 
