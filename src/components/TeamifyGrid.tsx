@@ -1,10 +1,7 @@
 import GridLayout from 'react-grid-layout'
 import React from 'react'
 import { css } from '@emotion/core'
-import { Menu, Header as SUHeader, Container } from 'semantic-ui-react'
-import { Link } from 'gatsby'
 import { colors } from '../styles/variables'
-import PlaycerCell from './PlayerCell'
 
 const getRandomInt = (max: number): number => {
   return Math.floor(Math.random() * Math.floor(max))
