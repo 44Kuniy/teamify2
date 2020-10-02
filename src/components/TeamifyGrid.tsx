@@ -2,6 +2,7 @@ import GridLayout from 'react-grid-layout'
 import React from 'react'
 import { css } from '@emotion/core'
 import { Menu, Header as SUHeader, Container } from 'semantic-ui-react'
+import { Link } from 'gatsby'
 import { colors } from '../styles/variables'
 import PlaycerCell from './PlayerCell'
 
@@ -103,6 +104,15 @@ const nameInput = css`
 const otherButtons = css`
   margin: 0px 12px 24px !important;
 `
+
+const h3 = css`
+  border: 2px solid #ff0000;
+  text-align: center;
+  border-radius: 5px;
+  margin: 18px 126px;
+  width: auto;
+  color: #333;
+`
 //
 interface ReactGridLayoutItem {
   i: string
@@ -120,6 +130,11 @@ interface ReactGridLayoutState {
   subGrid: Array<ReactGridLayoutItem>
   bottomGrid?: Array<ReactGridLayoutItem>
   loading?: boolean
+}
+
+interface Cord {
+  x: number
+  y: number
 }
 const APP_KEY = 'teamify-app'
 
@@ -175,15 +190,15 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     console.log('ON LAYOUT CHANGE')
     console.table(layout)
     const { mainGrid, subGrid } = this.state
-    const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
-      const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
-      gridItem.x = layoutItem.x
-      gridItem.y = layoutItem.y
-      gridItem.static = layoutItem.static
-      return gridItem
-    })
-    console.table(newGridLayout)
-    this.setState({ mainGrid: newGridLayout })
+    // const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
+    //   const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
+    //   gridItem.x = layoutItem.x
+    //   gridItem.y = layoutItem.y
+    //   gridItem.static = layoutItem.static
+    //   return gridItem
+    // })
+    // console.table(newGridLayout)
+    // this.setState({ mainGrid: newGridLayout })
     this.saveToLocalStorage({ mainGrid, subGrid })
   }
 
@@ -242,9 +257,17 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     return mainGrid
   }
 
-  fixCell = (index: number) => {
+  fixCell = (cord: Cord) => {
     const { mainGrid, subGrid } = this.state
-    mainGrid[index].static = !mainGrid[index].static
+    console.log(`cord.x :`, cord.x)
+    console.log(`cord.y :`, cord.y)
+    const cell = mainGrid.find((item: ReactGridLayoutItem) => {
+      console.log(`item : `, item)
+      return item.x === cord.x && item.y === cord.y
+    })
+    cell.static = !cell.static
+    const index = mainGrid.indexOf(cell)
+    mainGrid[index] = cell
     this.setState({ mainGrid })
     this.saveToLocalStorage({ mainGrid, subGrid })
   }
@@ -352,14 +375,16 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
                 isBounded
               >
                 {mainGrid.map((data, index) => {
+                  const isStatic = data.static
+                  const cord: Cord = { x: data.x, y: data.y }
                   return (
                     <div className={`elevation-4 ${loading || ''}`} css={cell} key={data.i} onContextMenu={e => this.cellToSub(index, e)}>
                       <div css={nameStyle}>{data.i}</div>
                       <button
                         type="button"
-                        className={`ui button ${this.state.mainGrid[index].static ? 'red' : ''}`}
+                        className={`ui button ${isStatic ? 'red' : ''}`}
                         css={fixButton}
-                        onClick={e => (data.y < 5 ? this.fixCell(this.getIndexFrom(data), e) : alert('はみ出さないように固定して'))}
+                        onClick={e => (data.y < 5 ? this.fixCell(cord, e) : alert('はみ出さないように固定して（上から５番目まで）'))}
                       >
                         固定
                       </button>
@@ -368,6 +393,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
                 })}
               </GridLayout>
             </div>
+
             <div css={buttons}>
               <div>
                 <button
@@ -395,6 +421,25 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
                   <input type="text" placeholder={`今 ${mainGrid.length} 人`} onKeyPress={e => this.addCell(e)} css={nameInput} />
                 </div>
               </div>
+            </div>
+            <div css={description}>
+              <h3 css={h3}>大事だから読んで</h3>
+              <ul>
+                <li>
+                  固定ボタン押すと、その人が固定されます。
+                  <br />
+                  （「AとBは同じチーム」とか「CとDは別のチーム」とか出来るよ）
+                </li>
+                <li>右クリックされた人はベンチに移ります</li>
+                <li>ベンチの人を右クリックすると左に戻ります</li>
+                <li>コピーボタン押して貼り付けるといい感じになるからDiscordとかにそのまま貼ってみて</li>
+                <li>
+                  <strong css={strongText}>このサイト、閉じても次開いたとき同じ状態のまま残ってるよ！</strong>
+                </li>
+                <li>
+                  IT系仕事受託募集してます。仕事くれる人DMください(twitter: <a href="https://twitter.com/Souler92y">@Souler92y</a>)
+                </li>
+              </ul>
             </div>
           </div>
           <div css={rightContainer}>
@@ -424,16 +469,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
             </div>
           </div>
         </div>
-        <div css={description}>
-          <ul>
-            <li>固定ボタン押すと、その人が固定されます（バグった時は一回シャッフルしてから固定機能使って）</li>
-            <li>右クリックされた人は、右のサブ枠に移ります</li>
-            <li>サブ枠を右クリックすると左に戻ります</li>
-            <li>
-              <strong css={strongText}> 勝手に保存されるから便利！</strong>
-            </li>
-          </ul>
-        </div>
+
         <div id="hidden" />
       </div>
     )
