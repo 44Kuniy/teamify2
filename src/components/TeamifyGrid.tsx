@@ -172,6 +172,17 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     console.log('ON LAYOUT CHANGE')
     console.table(layout)
     const { mainGrid, subGrid } = this.state
+
+    const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
+      const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
+      gridItem.x = layoutItem.x
+      gridItem.y = layoutItem.y
+      gridItem.static = layoutItem.static
+      return gridItem
+    })
+    console.table(newGridLayout)
+    this.setState({ mainGrid: newGridLayout })
+
     this.saveToLocalStorage({ mainGrid, subGrid })
   }
 
@@ -240,8 +251,12 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     })
     cell.static = !cell.static
     const index = mainGrid.indexOf(cell)
-    mainGrid[index] = cell
-    this.setState({ mainGrid })
+    const newGrid = [...mainGrid]
+    console.log(`newGrid :`, newGrid)
+    newGrid[index] = cell
+    this.setState({ mainGrid: newGrid })
+    console.log('FORCE UPD')
+    this.forceUpdate()
     this.saveToLocalStorage({ mainGrid, subGrid })
   }
 
@@ -272,7 +287,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.setState({ mainGrid })
     e.target.value = ''
     this.forceUpdate()
-    if (mainGrid.length === 10) this.shuffle()
+    // if (mainGrid.length === 10) this.shuffle()
   }
 
   cellToSub = (index: number, e: Event) => {
@@ -290,7 +305,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     subGrid.push(removedCell)
     this.setState({ subGrid })
     console.log(`subGrid2 :`, subGrid)
-    if (mainGrid.length === 10) this.shuffle()
+    // if (mainGrid.length === 10) this.shuffle()
     this.forceUpdate()
   }
 
@@ -302,7 +317,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.setState({ subGrid })
     mainGrid.push(movingCell)
     this.setState({ mainGrid })
-    if (mainGrid.length === 10) this.shuffle()
+    // if (mainGrid.length === 10) this.shuffle()
     this.forceUpdate()
   }
 
@@ -330,8 +345,8 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   render() {
-    const { mainGrid, subGrid, loading } = this.state
-
+    const { subGrid, loading } = this.state
+    const mainGrid = JSON.parse(JSON.stringify(this.state.mainGrid))
     return (
       <div>
         <div css={topContainer}>
