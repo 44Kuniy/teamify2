@@ -420,6 +420,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
                 </li>
                 <li>右クリックされた人はベンチに移ります</li>
                 <li>ベンチの人を右クリックすると左に戻ります</li>
+                <li>消すときはベンチに移してから</li>
                 <li>コピーボタン押して貼り付けるといい感じになるからDiscordとかにそのまま貼ってみて</li>
                 <li>
                   <strong css={strongText}>このサイト、閉じても次開いたとき同じ状態のまま残ってるよ！</strong>
