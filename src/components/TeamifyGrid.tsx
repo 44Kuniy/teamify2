@@ -149,7 +149,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   constructor(props: Prop) {
     super(props)
     this.onLayoutChange = this.onLayoutChange.bind(this)
-    this.handleContextMenu = this.handleContextMenu.bind(this)
     this.shuffleArray = this.shuffleArray.bind(this)
     this.fixCell = this.fixCell.bind(this)
     this.shuffle = this.shuffle.bind(this)
@@ -159,7 +158,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.deleteCell = this.deleteCell.bind(this)
     this.copyToCripBoard = this.copyToCripBoard.bind(this)
     this.setTeamCount = this.setTeamCount.bind(this)
-    const state: ReactGridLayoutState = this.fetchLS()
+    const state: ReactGridLayoutState = this.fetchLocalStorage()
     console.log(`Initial state :`, state)
     if (!state.mainGrid) state.mainGrid = []
     if (!state.subGrid) state.subGrid = [{ x: 0, y: 0, w: 1, h: 1, static: false, i: 'ベンチ君' }]
@@ -176,12 +175,10 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   onLayoutChange(layout) {
-    console.log('ON LAYOUT CHANGE')
-    console.table(layout)
+    console.log('LAYOUT CHANGE')
     const { mainGrid, subGrid } = this.state
 
     const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
-      console.log(`layoutItem :`, layoutItem)
       const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
       gridItem.x = layoutItem.x
       gridItem.y = layoutItem.y
@@ -190,18 +187,10 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     })
     console.table(newGridLayout)
     this.setState({ mainGrid: newGridLayout })
-
     this.saveToLocalStorage({ ...this.state, mainGrid, subGrid })
   }
 
-  handleContextMenu = e => {
-    e.preventDefault()
-    console.log('handleContextMenu', e)
-    localStorage.setItem(APP_KEY, JSON.stringify({ test: 'storage test' }))
-  }
-
   saveToLocalStorage = (state: ReactGridLayoutState) => {
-    console.log('saveToLocalStorage')
     localStorage.setItem(APP_KEY, JSON.stringify(state))
   }
 
@@ -217,8 +206,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
 
   isBrowser = () => typeof window !== 'undefined'
 
-  fetchLS = () => {
-    console.log(`fetchLS :`)
+  fetchLocalStorage = () => {
     const data = this.isBrowser() && window.localStorage.getItem(APP_KEY) ? JSON.parse(window.localStorage.getItem(APP_KEY)) : {}
     return data
   }
@@ -234,13 +222,11 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
       const item: ReactGridLayoutItem = arr[index]
       if (item.static) {
         const staticElement = arr[index]
-        console.log(`staticElement :`, staticElement)
         const gridIndex = this.getIndexFrom(staticElement)
         result[index] = staticElement
         arr[index] = undefined
       }
     }
-    console.log(`result :`, result)
     const shuffled = staticShuffle(arr.filter(_ => Boolean(_)), result)
     const mainGrid = shuffled.map((item: ReactGridLayoutItem, index: number) => {
       const gridData = { ...item }
@@ -253,21 +239,16 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
 
   fixCell = (cord: Cord) => {
     const { mainGrid, subGrid } = this.state
-    console.log(`cord.x :`, cord.x)
-    console.log(`cord.y :`, cord.y)
-    const cell = mainGrid.find((item: ReactGridLayoutItem) => {
-      console.log(`item : `, item)
+    const targetCell: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => {
       return item.x === cord.x && item.y === cord.y
     })
-    cell.static = !cell.static
-    const index = mainGrid.indexOf(cell)
+    targetCell.static = !targetCell.static
+    const index = mainGrid.indexOf(targetCell)
     const newGrid = [...mainGrid]
-    console.log(`newGrid :`, newGrid)
-    newGrid[index] = cell
+    newGrid[index] = targetCell
     this.setState({ mainGrid: newGrid })
-    console.log('FORCE UPD')
     this.forceUpdate()
-    this.saveToLocalStorage({ mainGrid, subGrid })
+    this.saveToLocalStorage({ ...this.state, mainGrid, subGrid })
   }
 
   addCell = (e: Event) => {
@@ -299,7 +280,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   cellToSub = (index: number, e: Event) => {
-    console.log('cell to sub')
     e.preventDefault()
     const { mainGrid, subGrid } = this.state
     if (mainGrid[index].static) {
@@ -308,17 +288,13 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     }
     const [removedCell] = mainGrid.splice(index, 1)
     this.setState({ mainGrid })
-    console.log(`removedCell :`, removedCell)
-    console.log(`subGrid :`, subGrid)
     subGrid.push(removedCell)
     this.setState({ subGrid })
-    console.log(`subGrid2 :`, subGrid)
     this.forceUpdate()
   }
 
   cellToMain = (index: number, e: Event) => {
     e.preventDefault()
-    console.log('CELL TO MAIN', index)
     const { mainGrid, subGrid } = this.state
     const [movingCell] = subGrid.splice(index, 1)
     this.setState({ subGrid })
@@ -328,7 +304,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   deleteCell = (index: number, e: Event) => {
-    console.log('DELETE CELL', index)
     const { subGrid } = this.state
     subGrid.splice(index, 1)
     this.setState({ subGrid })
@@ -341,7 +316,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
       return `${accumulator + currentValue.i}\n`
     }, '.\n```= Team 1 =```\n')
     const textField = document.createElement('textarea')
-    const br = document.createElement('br')
     textField.value = text
     const parentElement = document.getElementById('hidden')
     parentElement.appendChild(textField)
@@ -480,7 +454,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
             </div>
           </div>
         </div>
-
         <div id="hidden" />
       </div>
     )
