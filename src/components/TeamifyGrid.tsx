@@ -162,7 +162,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     const state: ReactGridLayoutState = this.fetchLS()
     console.log(`Initial state :`, state)
     if (!state.mainGrid) state.mainGrid = []
-    if (!state.subGrid) state.subGrid = []
+    if (!state.subGrid) state.subGrid = [{ x: 0, y: 0, w: 1, h: 1, static: false, i: 'ベンチ君' }]
     if (!state.teamCount) state.teamCount = 10
     const { mainGrid, subGrid, teamCount } = state
 
