@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: 'Teamify',
+    title: 'Teamify (チーム分け)',
     description: 'A starter kit for TypeScript-based Gatsby projects with sensible defaults.',
     keywords: 'gatsbyjs, gatsby, javascript, sample, something',
     siteUrl: 'https://gatsby-starter-typescript-plus.netlify.com',
