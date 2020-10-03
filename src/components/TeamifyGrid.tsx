@@ -110,6 +110,14 @@ const h3 = css`
   width: auto;
   color: #333;
 `
+
+const teamCountSelector = css`
+  line-height: 2.4rem;
+`
+
+const select = css`
+  padding: 5px !important;
+`
 //
 interface ReactGridLayoutItem {
   i: string
@@ -125,6 +133,7 @@ interface ReactGridLayoutItem {
 interface ReactGridLayoutState {
   mainGrid: Array<ReactGridLayoutItem>
   subGrid: Array<ReactGridLayoutItem>
+  teamCount: number
   bottomGrid?: Array<ReactGridLayoutItem>
   loading?: boolean
 }
@@ -149,18 +158,19 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.cellToMain = this.cellToMain.bind(this)
     this.deleteCell = this.deleteCell.bind(this)
     this.copyToCripBoard = this.copyToCripBoard.bind(this)
-
+    this.setTeamCount = this.setTeamCount.bind(this)
     const state: ReactGridLayoutState = this.fetchLS()
+    console.log(`Initial state :`, state)
     if (!state.mainGrid) state.mainGrid = []
     if (!state.subGrid) state.subGrid = []
-
-    const { mainGrid, subGrid } = state
+    if (!state.teamCount) state.teamCount = 10
+    const { mainGrid, subGrid, teamCount } = state
 
     // stateの初期値を設定
     this.state = {
       mainGrid,
       subGrid,
-      bottomGrid: [],
+      teamCount,
       loading: true
     }
   }
@@ -171,6 +181,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     const { mainGrid, subGrid } = this.state
 
     const newGridLayout: ReactGridLayoutItem[] = layout.map((layoutItem: ReactGridLayoutItem) => {
+      console.log(`layoutItem :`, layoutItem)
       const gridItem: ReactGridLayoutItem = mainGrid.find((item: ReactGridLayoutItem) => item.i === layoutItem.i)
       gridItem.x = layoutItem.x
       gridItem.y = layoutItem.y
@@ -180,7 +191,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     console.table(newGridLayout)
     this.setState({ mainGrid: newGridLayout })
 
-    this.saveToLocalStorage({ mainGrid, subGrid })
+    this.saveToLocalStorage({ ...this.state, mainGrid, subGrid })
   }
 
   handleContextMenu = e => {
@@ -195,9 +206,9 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   }
 
   shuffle = () => {
-    const { mainGrid } = this.state
-    if (mainGrid.length !== 10) {
-      alert('チーム分けは１０人で頼むわ')
+    const { mainGrid, teamCount } = this.state
+    if (mainGrid.length !== teamCount) {
+      alert(`チーム分けは${teamCount}人で頼むわ`)
       return
     }
     const shuffled = this.shuffleArray(mainGrid)
@@ -215,24 +226,26 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
   getIndexFrom = (item: ReactGridLayoutItem) => item.x * 5 + item.y
 
   shuffleArray = (array: ReactGridLayoutItem[]) => {
+    const { teamCount } = this.state
     const arr = Array.from(array)
     const result: ReactGridLayoutItem[] = []
-    result.length = 10
+    result.length = teamCount
     for (let index = 0; index < arr.length; index += 1) {
       const item: ReactGridLayoutItem = arr[index]
-      const isstatic = item.static
-      if (isstatic) {
+      if (item.static) {
         const staticElement = arr[index]
+        console.log(`staticElement :`, staticElement)
         const gridIndex = this.getIndexFrom(staticElement)
-        result[gridIndex] = staticElement
+        result[index] = staticElement
         arr[index] = undefined
       }
     }
+    console.log(`result :`, result)
     const shuffled = staticShuffle(arr.filter(_ => Boolean(_)), result)
     const mainGrid = shuffled.map((item: ReactGridLayoutItem, index: number) => {
       const gridData = { ...item }
-      gridData.x = Math.floor(index / 5)
-      gridData.y = index % 5
+      gridData.x = Math.floor(index / (teamCount / 2))
+      gridData.y = index % (teamCount / 2)
       return gridData
     })
     return mainGrid
@@ -271,7 +284,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     const isLeftTeam = leftTeamCount <= rightTeamCount
     const x = isLeftTeam ? 0 : 1
     const y = isLeftTeam ? leftTeamCount : rightTeamCount
-    // if (mainGrid.length >= 10) {alert('10人までで頼むわ')}
     const item: ReactGridLayoutItem = {
       x,
       y,
@@ -284,7 +296,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.setState({ mainGrid })
     e.target.value = ''
     this.forceUpdate()
-    // if (mainGrid.length === 10) this.shuffle()
   }
 
   cellToSub = (index: number, e: Event) => {
@@ -302,7 +313,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     subGrid.push(removedCell)
     this.setState({ subGrid })
     console.log(`subGrid2 :`, subGrid)
-    // if (mainGrid.length === 10) this.shuffle()
     this.forceUpdate()
   }
 
@@ -314,7 +324,6 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     this.setState({ subGrid })
     mainGrid.push(movingCell)
     this.setState({ mainGrid })
-    // if (mainGrid.length === 10) this.shuffle()
     this.forceUpdate()
   }
 
@@ -341,9 +350,17 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
     parentElement.removeChild(textField)
   }
 
+  setTeamCount = (e: Event) => {
+    const teamCount = Number(e.target.value)
+    console.log(`teamCount :`, teamCount)
+    this.setState({ teamCount })
+    this.saveToLocalStorage({ ...this.state, teamCount })
+  }
+
   render() {
-    const { subGrid, loading } = this.state
+    const { subGrid, loading, teamCount } = this.state
     const mainGrid = JSON.parse(JSON.stringify(this.state.mainGrid))
+    const teamCountCanditates: number[] = [4, 6, 8, 10, 12, 14, 16, 18, 20]
     return (
       <div>
         <div css={topContainer}>
@@ -369,7 +386,7 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
                         type="button"
                         className={`ui button ${isStatic ? 'red' : ''}`}
                         css={fixButton}
-                        onClick={e => (data.y < 5 ? this.fixCell(cord, e) : alert('はみ出さないように固定して（上から５番目まで）'))}
+                        onClick={e => (data.y < teamCount / 2 ? this.fixCell(cord, e) : alert('はみ出さないように固定して'))}
                       >
                         固定
                       </button>
@@ -381,6 +398,14 @@ class TeamifyGrid extends React.Component<{}, ReactGridLayoutState> {
 
             <div css={buttons}>
               <div>
+                <div className="ui action input" css={teamCountSelector}>
+                  <select defaultValue={teamCount} className="ui compact selection dropdown" css={select} onChange={this.setTeamCount}>
+                    {teamCountCanditates.map((canditateNumber: number) => {
+                      return <option value={canditateNumber}>{canditateNumber}</option>
+                    })}
+                  </select>
+                  人
+                </div>
                 <button
                   type="button"
                   className="ui button teal
